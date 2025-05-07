@@ -1,4 +1,28 @@
 import 'package:flutter/material.dart';
+import 'historia.dart';
+import 'ingles.dart';
+import 'matematicas.dart';
+import 'ciencias_naturales.dart';
+import 'informatica.dart';
+
+class Gestor {
+  static List<Map<String, dynamic>> getQuestionsForCategory(String category) {
+    switch (category) {
+      case 'Historia':
+        return historiaQuestions;
+      case 'Inglés':
+        return inglesQuestions;
+      case 'Matemáticas':
+        return matematicasQuestions;
+      case 'Ciencias Naturales':
+        return cienciasNaturalesQuestions;
+      case 'Informática':
+        return informaticaQuestions;
+      default:
+        return [];
+    }
+  }
+}
 
 class QuestionsScreen extends StatefulWidget {
   final String category;
@@ -16,63 +40,74 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final questions = _getQuestionsForCategory(widget.category);
+    final questions = Gestor.getQuestionsForCategory(widget.category);
     final currentQuestion = questions[_currentQuestionIndex];
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          'Category: ${widget.category}',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        Container(
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white, // Fondo blanco
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 3), // Sombra hacia abajo
+              ),
+            ],
+          ),
+          child: Text(
+            currentQuestion['question'],
+            style: TextStyle(fontSize: 50, color: Colors.black), // Cambiamos el color a negro
+            textAlign: TextAlign.center,
+          ),
         ),
         SizedBox(height: 20),
-        Text(
-          currentQuestion['question'],
-          style: TextStyle(fontSize: 18),
-        ),
-        SizedBox(height: 20),
-        ...currentQuestion['options'].map<Widget>((option) {
-          return Container(
-            margin: EdgeInsets.symmetric(vertical: 5),
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _isCorrect == null
-                    ? Colors.black
-                    : (option == currentQuestion['correctAnswer']
-                        ? Colors.green
-                        : Colors.red),
-                textStyle: TextStyle(color: Colors.black), // Cambiado de blanco a negro
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(0),
+        Column(
+          children: currentQuestion['options'].map<Widget>((option) {
+            return SizedBox(
+              width: 300, // Ancho fijo para todos los botones
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10), // Espaciado vertical entre botones
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black, // Fondo negro
+                    textStyle: TextStyle(color: Colors.white), // Texto blanco
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 20), // Tamaño similar a play.dart
+                  ),
+                  onPressed: _isCorrect == null
+                      ? () {
+                          setState(() {
+                            _isCorrect = option == currentQuestion['correctAnswer'];
+                          });
+                          Future.delayed(Duration(seconds: 1), () {
+                            setState(() {
+                              if (_currentQuestionIndex < questions.length - 1) {
+                                _currentQuestionIndex++;
+                                _isCorrect = null;
+                              } else {
+                                widget.onBack();
+                              }
+                            });
+                          });
+                        }
+                      : null,
+                  child: Text(
+                    option,
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
                 ),
-                padding: EdgeInsets.symmetric(vertical: 20),
               ),
-              onPressed: _isCorrect == null
-                  ? () {
-                      setState(() {
-                        _isCorrect = option == currentQuestion['correctAnswer'];
-                      });
-                      Future.delayed(Duration(seconds: 1), () {
-                        setState(() {
-                          if (_currentQuestionIndex < questions.length - 1) {
-                            _currentQuestionIndex++;
-                            _isCorrect = null;
-                          } else {
-                            widget.onBack();
-                          }
-                        });
-                      });
-                    }
-                  : null,
-              child: Text(
-                option,
-                style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16),
-              ),
-            ),
-          );
-        }).toList(),
+            );
+          }).toList(),
+        ),
         SizedBox(height: 20),
         ElevatedButton(
           onPressed: widget.onBack,
@@ -80,77 +115,5 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
         ),
       ],
     );
-  }
-
-  List<Map<String, dynamic>> _getQuestionsForCategory(String category) {
-    switch (category) {
-      case 'Historia':
-        return [
-          {
-            'question': '¿Quién descubrió América?',
-            'options': ['Cristóbal Colón', 'Simón Bolívar', 'Napoleón', 'Hernán Cortés'],
-            'correctAnswer': 'Cristóbal Colón',
-          },
-          {
-            'question': '¿En qué año comenzó la Primera Guerra Mundial?',
-            'options': ['1914', '1939', '1812', '1945'],
-            'correctAnswer': '1914',
-          },
-        ];
-      case 'Inglés':
-        return [
-          {
-            'question': 'What is the past tense of "go"?',
-            'options': ['Went', 'Goed', 'Gone', 'Goes'],
-            'correctAnswer': 'Went',
-          },
-          {
-            'question': 'Which word is a synonym for "happy"?',
-            'options': ['Sad', 'Joyful', 'Angry', 'Tired'],
-            'correctAnswer': 'Joyful',
-          },
-        ];
-      case 'Matemáticas':
-        return [
-          {
-            'question': '¿Cuánto es 2 + 2?',
-            'options': ['4', '3', '5', '6'],
-            'correctAnswer': '4',
-          },
-          {
-            'question': '¿Cuál es el valor de pi (aproximado)?',
-            'options': ['3.14', '2.71', '1.41', '1.61'],
-            'correctAnswer': '3.14',
-          },
-        ];
-      case 'Ciencias Naturales':
-        return [
-          {
-            'question': '¿Cuál es el planeta más grande del sistema solar?',
-            'options': ['Júpiter', 'Saturno', 'Tierra', 'Marte'],
-            'correctAnswer': 'Júpiter',
-          },
-          {
-            'question': '¿Qué gas es esencial para la respiración humana?',
-            'options': ['Oxígeno', 'Hidrógeno', 'Nitrógeno', 'Dióxido de carbono'],
-            'correctAnswer': 'Oxígeno',
-          },
-        ];
-      case 'Informática':
-        return [
-          {
-            'question': '¿Qué significa CPU?',
-            'options': ['Unidad Central de Procesamiento', 'Unidad de Control de Procesos', 'Unidad de Computación Personal', 'Unidad de Procesamiento de Cálculos'],
-            'correctAnswer': 'Unidad Central de Procesamiento',
-          },
-          {
-            'question': '¿Qué lenguaje se utiliza para desarrollar aplicaciones Android?',
-            'options': ['Java', 'Python', 'C++', 'Ruby'],
-            'correctAnswer': 'Java',
-          },
-        ];
-      default:
-        return [];
-    }
   }
 }

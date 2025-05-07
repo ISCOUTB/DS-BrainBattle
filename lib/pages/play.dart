@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import '../categorias/questions.dart';
+import '../categorias/historia.dart';
+import '../categorias/ingles.dart';
+import '../categorias/matematicas.dart';
+import '../categorias/ciencias_naturales.dart';
+import '../categorias/informatica.dart';
 
 class PlayScreen extends StatefulWidget {
   @override
