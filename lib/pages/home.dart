@@ -14,7 +14,17 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text('brainbattle')),
+        title: Center(
+          child: Text(
+            'brainbattle',
+            style: TextStyle(
+              fontStyle: FontStyle.italic, // Fuente cursiva
+              fontWeight: FontWeight.bold, // Fuente más gruesa
+              fontSize: 50, // Tamaño de fuente más grande
+              fontFamily: 'Georgia', // Fuente elegante
+            ),
+          ),
+        ),
         actions: [
           Switch(
             value: isDarkTheme,
@@ -25,7 +35,13 @@ class HomeScreen extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue, Colors.purple, Colors.red, Colors.orange],
+            colors: [
+              Colors.red, // Historia
+              Colors.blue, // Inglés
+              Colors.green, // Matemáticas
+              Colors.orange, // Ciencias Naturales
+              Colors.purple, // Informática
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -37,7 +53,7 @@ class HomeScreen extends StatelessWidget {
               Text(
                 '¡Bienvenido a brainbattle!',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 32, // Tamaño de fuente más grande
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Roboto',
@@ -45,15 +61,22 @@ class HomeScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20), // Forma de rectángulo redondeado
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20), // Botón más grande
+                ),
                 onPressed: () {
                   Navigator.pushNamed(context, '/play');
                 },
                 child: Text(
                   'Jugar',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 20, // Fuente más grande
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Roboto',
+                    color: Colors.white, // Letra blanca
                   ),
                 ),
               ),
@@ -62,16 +85,19 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
+                    iconSize: 40, // Botón más grande
                     icon: Icon(Icons.facebook, color: Colors.white),
                     onPressed: () {},
                   ),
                   SizedBox(width: 20),
                   IconButton(
+                    iconSize: 40, // Botón más grande
                     icon: Icon(Icons.apple, color: Colors.white),
                     onPressed: () {},
                   ),
                   SizedBox(width: 20),
                   IconButton(
+                    iconSize: 40, // Botón más grande
                     icon: Icon(Icons.g_mobiledata, color: Colors.white),
                     onPressed: () {},
                   ),

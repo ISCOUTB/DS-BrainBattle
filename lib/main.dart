@@ -12,7 +12,7 @@ class BrainBattleApp extends StatefulWidget {
 }
 
 class _BrainBattleAppState extends State<BrainBattleApp> {
-  bool isDarkTheme = false;
+  bool isDarkTheme = true; // Cambiado a true para que el modo oscuro sea el predeterminado
 
   void toggleTheme(bool value) {
     setState(() {
