@@ -34,16 +34,9 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.red, // Historia
-              Colors.blue, // Inglés
-              Colors.green, // Matemáticas
-              Colors.orange, // Ciencias Naturales
-              Colors.purple, // Informática
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+          image: DecorationImage(
+            image: AssetImage('assets/home.jpg'),
+            fit: BoxFit.cover, // Ajusta la imagen para cubrir todo el fondo
           ),
         ),
         child: Center(

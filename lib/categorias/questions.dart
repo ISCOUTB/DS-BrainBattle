@@ -43,7 +43,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                     : (option == currentQuestion['correctAnswer']
                         ? Colors.green
                         : Colors.red),
-                textStyle: TextStyle(color: Colors.white),
+                textStyle: TextStyle(color: Colors.black), // Cambiado de blanco a negro
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(0),
                 ),
@@ -68,7 +68,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                   : null,
               child: Text(
                 option,
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16),
               ),
             ),
           );

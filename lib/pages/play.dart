@@ -40,13 +40,17 @@ class _PlayScreenState extends State<PlayScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/play.jpg'), // Imagen de fondo
+            fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el fondo
+          ),
           gradient: LinearGradient(
             colors: [
-              Colors.red, // Historia
-              Colors.blue, // Inglés
-              Colors.green, // Matemáticas
-              Colors.orange, // Ciencias Naturales
-              Colors.purple, // Informática
+              Colors.red.withOpacity(0.5), // Historia con opacidad
+              Colors.blue.withOpacity(0.5), // Inglés con opacidad
+              Colors.green.withOpacity(0.5), // Matemáticas con opacidad
+              Colors.orange.withOpacity(0.5), // Ciencias Naturales con opacidad
+              Colors.purple.withOpacity(0.5), // Informática con opacidad
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
