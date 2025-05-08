@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   intl: ^0.18.0 # Agregado para soporte de formateo de fechas
+  http: ^1.4.0
 
 dev_dependencies:
   flutter_test:
