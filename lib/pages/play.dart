@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import '../categorias/questions.dart';
-import '../categorias/historia.dart';
-import '../categorias/ingles.dart';
-import '../categorias/matematicas.dart';
-import '../categorias/ciencias_naturales.dart';
-import '../categorias/informatica.dart';
+import 'usuario.dart';
 
 class PlayScreen extends StatefulWidget {
   @override
@@ -31,17 +27,40 @@ class _PlayScreenState extends State<PlayScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Center(
-          child: Text(
-            'Play BrainBattle',
-            style: TextStyle(
-              fontStyle: FontStyle.italic, // Fuente cursiva
-              fontWeight: FontWeight.bold, // Fuente más gruesa
-              fontSize: 50, // Tamaño de fuente más grande
-              fontFamily: 'Georgia', // Fuente elegante
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center, // Centrar el título
+          children: [
+            Text(
+              'Play BrainBattle',
+              style: TextStyle(
+                fontStyle: FontStyle.italic, // Fuente cursiva
+                fontWeight: FontWeight.bold, // Fuente más gruesa
+                fontSize: 50, // Tamaño de fuente más grande
+                fontFamily: 'Georgia', // Fuente elegante
+              ),
             ),
-          ),
+          ],
         ),
+        actions: [
+          IconButton(
+            icon: CircleAvatar(
+              radius: 20,
+              backgroundImage: AssetImage('assets/home.jpg'), // Cambiar por imagen seleccionada
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UsuarioScreen(
+                    nombre: 'Nombre',
+                    apellido: 'Apellido',
+                    usuario: 'Usuario',
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(

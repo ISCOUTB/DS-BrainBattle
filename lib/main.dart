@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'pages/home.dart';
 import 'pages/play.dart';
+import 'pages/register.dart';
 
 void main() {
   runApp(BrainBattleApp());
@@ -29,6 +30,10 @@ class _BrainBattleAppState extends State<BrainBattleApp> {
       home: HomeScreen(toggleTheme: toggleTheme, isDarkTheme: isDarkTheme),
       routes: {
         '/play': (context) => PlayScreen(),
+        '/register': (context) => RegisterScreen(
+          isDarkTheme: isDarkTheme,
+          toggleTheme: toggleTheme,
+        ),
       },
     );
   }
