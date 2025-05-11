@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'register.dart'; // Importar la nueva página de registro
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatelessWidget {
   final Function(bool) toggleTheme;
@@ -10,6 +11,35 @@ class HomeScreen extends StatelessWidget {
     required this.toggleTheme,
     required this.isDarkTheme,
   }) : super(key: key);
+
+  Future<void> _login(BuildContext context, String username, String password) async {
+    final url = Uri.parse('http://localhost:8000/api/login');
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Inicio de sesión exitoso')),
+        );
+        // Navegar a la pantalla principal o dashboard
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Credenciales incorrectas')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error de conexión: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +180,7 @@ class HomeScreen extends StatelessWidget {
                               },
                             );
                           } else {
-                            Navigator.pushNamed(context, '/play');
+                            _login(context, userController.text, passwordController.text);
                           }
                         },
                         child: Text(

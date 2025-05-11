@@ -41,38 +41,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       final url = Uri.parse('http://localhost:8000/api/registerUser');
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': _emailController.text,
-          'first_name': _firstNameController.text,
-          'last_name': _lastNameController.text,
-          'username': _usernameController.text,
-          'password': _passwordController.text,
-          'registration_date': DateTime.now().toIso8601String(),
-        }),
-      );
+      try {
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'email': _emailController.text,
+            'first_name': _firstNameController.text,
+            'last_name': _lastNameController.text,
+            'username': _usernameController.text,
+            'password': _passwordController.text,
+            'registration_date': "${DateTime.now().month}/${DateTime.now().year}",
+          }),
+        );
 
-      if (response.statusCode == 200) {
-        Navigator.pop(context);
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Error'),
-              content: Text('No se pudo registrar el usuario. Inténtelo de nuevo.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Registro exitoso')),
+          );
+          Navigator.pop(context); // Regresa a la pantalla anterior
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error al registrar usuario')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error de conexión: $e')),
         );
       }
     }
