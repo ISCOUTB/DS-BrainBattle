@@ -69,8 +69,9 @@ class HomeScreen extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/home.jpg'),
-            fit: BoxFit.cover, // Ajusta la imagen para cubrir todo el fondo
+            image: AssetImage('assets/usu-contra.jpg'),
+            fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el fondo
+            alignment: Alignment.center, // Centrar la imagen
           ),
         ),
         child: Center(

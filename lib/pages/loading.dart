@@ -9,8 +9,9 @@ class LoadingScreen extends StatelessWidget {
         height: double.infinity, // Asegura que el contenedor cubra todo el alto
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/play.jpg'), // Imagen de fondo
+            image: AssetImage('assets/loading.jpg'), // Imagen de fondo
             fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el fondo
+            alignment: Alignment.center, // Centrar la imagen
           ),
         ),
         child: Column(

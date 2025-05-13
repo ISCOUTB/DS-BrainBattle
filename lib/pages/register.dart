@@ -99,8 +99,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/home.jpg'),
-            fit: BoxFit.cover,
+            image: AssetImage('assets/registro.jpg'),
+            fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el fondo
+            alignment: Alignment.center, // Centrar la imagen
           ),
         ),
         child: Center(

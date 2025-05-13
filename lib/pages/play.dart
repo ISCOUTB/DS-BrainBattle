@@ -45,7 +45,7 @@ class _PlayScreenState extends State<PlayScreen> {
           IconButton(
             icon: CircleAvatar(
               radius: 20,
-              backgroundImage: AssetImage('assets/home.jpg'), // Cambiar por imagen seleccionada
+              backgroundImage: AssetImage('assets/categorias.jpg'), // Cambiar por imagen seleccionada
             ),
             onPressed: () {
               Navigator.push(
@@ -65,8 +65,9 @@ class _PlayScreenState extends State<PlayScreen> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/play.jpg'), // Imagen de fondo
+            image: AssetImage('assets/categorias.jpg'),
             fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el fondo
+            alignment: Alignment.center, // Centrar la imagen
           ),
           gradient: LinearGradient(
             colors: [
