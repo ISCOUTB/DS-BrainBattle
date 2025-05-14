@@ -53,10 +53,13 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
         ],
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/home.jpg'),
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
+            alignment: Alignment.center,
           ),
         ),
         child: Center(

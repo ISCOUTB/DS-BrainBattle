@@ -48,7 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           body: jsonEncode({
             'email': _emailController.text,
             'first_name': _firstNameController.text,
-            'last_name': _lastNameController.text,
+            'last_name': _firstNameController.text,
             'username': _usernameController.text,
             'password': _passwordController.text,
             'registration_date': "${DateTime.now().month}/${DateTime.now().year}",
@@ -56,18 +56,60 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
 
         if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Registro exitoso')),
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Éxito'),
+                content: Text('Registro exitoso'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.pushReplacementNamed(context, '/'); // Redirige a home.dart
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
           );
-          Navigator.pop(context); // Regresa a la pantalla anterior
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al registrar usuario')),
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Error'),
+                content: Text('Error al registrar usuario'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
           );
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error de conexión: $e')),
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Error de conexión'),
+              content: Text('Error de conexión: $e'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
         );
       }
     }
@@ -97,11 +139,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ],
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/registro.jpg'),
-            fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el fondo
-            alignment: Alignment.center, // Centrar la imagen
+            fit: BoxFit.contain,
+            alignment: Alignment.center,
           ),
         ),
         child: Center(

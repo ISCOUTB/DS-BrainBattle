@@ -43,14 +43,37 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     final questions = Gestor.getQuestionsForCategory(widget.category);
     final currentQuestion = questions[_currentQuestionIndex];
 
+    // Selección dinámica del fondo según la categoría
+    String backgroundImage;
+    switch (widget.category) {
+      case 'Historia':
+        backgroundImage = 'assets/historia.jpg';
+        break;
+      case 'Inglés':
+        backgroundImage = 'assets/ingles.jpg';
+        break;
+      case 'Matemáticas':
+        backgroundImage = 'assets/mate.jpg';
+        break;
+      case 'Ciencias Naturales':
+        backgroundImage = 'assets/biologia.jpg';
+        break;
+      case 'Informática':
+        backgroundImage = 'assets/info.jpg';
+        break;
+      default:
+        backgroundImage = 'assets/questions.jpg';
+    }
+
     return Scaffold(
       body: Container(
-        width: double.infinity, // Asegura que el fondo cubra todo el ancho
-        height: double.infinity, // Asegura que el fondo cubra todo el alto
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/questions.jpg'),
-            fit: BoxFit.cover,
+            image: AssetImage(backgroundImage),
+            fit: BoxFit.contain,
+            alignment: Alignment.center,
           ),
         ),
         child: Column(

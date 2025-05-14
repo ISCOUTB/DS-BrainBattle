@@ -10,7 +10,7 @@ class LoadingScreen extends StatelessWidget {
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/loading.jpg'), // Imagen de fondo
-            fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el fondo
+            fit: BoxFit.contain, // Ajustar la imagen para que se vea completa
             alignment: Alignment.center, // Centrar la imagen
           ),
         ),

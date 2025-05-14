@@ -63,22 +63,13 @@ class _PlayScreenState extends State<PlayScreen> {
         ],
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/categorias.jpg'),
-            fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el fondo
-            alignment: Alignment.center, // Centrar la imagen
-          ),
-          gradient: LinearGradient(
-            colors: [
-              Colors.red.withOpacity(0.5), // Historia con opacidad
-              Colors.blue.withOpacity(0.5), // Inglés con opacidad
-              Colors.green.withOpacity(0.5), // Matemáticas con opacidad
-              Colors.orange.withOpacity(0.5), // Ciencias Naturales con opacidad
-              Colors.purple.withOpacity(0.5), // Informática con opacidad
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            fit: BoxFit.contain,
+            alignment: Alignment.center,
           ),
         ),
         child: Center(
