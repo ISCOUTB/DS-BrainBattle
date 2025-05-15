@@ -22,4 +22,25 @@ class ApiService {
       body: jsonEncode({'username': username, 'password': password}),
     );
   }
+
+  static Future<List<Map<String, dynamic>>> fetchPreguntas() async {
+    final url = Uri.parse('$baseUrl/preguntas');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
+      return data.map<Map<String, dynamic>>((item) => {
+        'question': item['enunciado'],
+        'options': [
+          item['respuesta_correcta'],
+          item['respuesta_incorrecta1'],
+          item['respuesta_incorrecta2'],
+          item['respuesta_incorrecta3'],
+        ]..shuffle(),
+        'correctAnswer': item['respuesta_correcta'],
+        'categoria': item['categoria'],
+      }).toList();
+    } else {
+      throw Exception('Error al cargar preguntas');
+    }
+  }
 }
