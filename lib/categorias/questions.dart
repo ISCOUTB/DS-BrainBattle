@@ -20,13 +20,42 @@ class QuestionsScreen extends StatefulWidget {
 
 class _QuestionsScreenState extends State<QuestionsScreen> {
   int _currentQuestionIndex = 0;
-  bool? _isCorrect;
+  int? _selectedIndex; // índice de la opción seleccionada
   late Future<List<Map<String, dynamic>>> _questionsFuture;
 
   @override
   void initState() {
     super.initState();
     _questionsFuture = Gestor.getQuestionsForCategory(widget.category);
+  }
+
+  Color? _getButtonColor(int index, List<String> options, Map<String, dynamic> currentQuestion) {
+    if (_selectedIndex == null) return Colors.black;
+    final correct = options[index] == (currentQuestion['correctAnswer'] ?? currentQuestion['RespuestaCorrecta']);
+    if (index == _selectedIndex) {
+      return correct ? Colors.green : Colors.red;
+    }
+    // Si ya se seleccionó y este botón es la respuesta correcta, mostrar verde
+    if (_selectedIndex != null && correct) {
+      return Colors.green;
+    }
+    return Colors.black;
+  }
+
+  ButtonStyle _getButtonStyle(int index, List<String> options, Map<String, dynamic> currentQuestion) {
+    final color = _getButtonColor(index, options, currentQuestion);
+    return ElevatedButton.styleFrom(
+      backgroundColor: color,
+      foregroundColor: Colors.white,
+      disabledBackgroundColor: color, // Para que el color se mantenga aunque esté deshabilitado
+      disabledForegroundColor: Colors.white,
+      textStyle: TextStyle(color: Colors.white),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 20),
+      elevation: 2,
+    );
   }
 
   @override
@@ -124,30 +153,24 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                 ),
                 SizedBox(height: 20),
                 Column(
-                  children: options.map((option) {
+                  children: List.generate(options.length, (index) {
+                    final option = options[index];
                     return SizedBox(
                       width: 300,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            textStyle: TextStyle(color: Colors.white),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            padding: EdgeInsets.symmetric(vertical: 20),
-                          ),
-                          onPressed: _isCorrect == null
+                          style: _getButtonStyle(index, options, currentQuestion),
+                          onPressed: _selectedIndex == null
                               ? () {
                                   setState(() {
-                                    _isCorrect = option == (currentQuestion['correctAnswer'] ?? currentQuestion['RespuestaCorrecta']);
+                                    _selectedIndex = index;
                                   });
                                   Future.delayed(Duration(seconds: 1), () {
                                     setState(() {
                                       if (_currentQuestionIndex < questions.length - 1) {
                                         _currentQuestionIndex++;
-                                        _isCorrect = null;
+                                        _selectedIndex = null;
                                       } else {
                                         widget.onBack();
                                       }
@@ -157,12 +180,12 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                               : null,
                           child: Text(
                             option,
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
                     );
-                  }).toList(),
+                  }),
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
