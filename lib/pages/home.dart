@@ -92,7 +92,7 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Center(
           child: Text(
-            'brainbattle',
+            '',
             style: TextStyle(
               fontStyle: FontStyle.italic, // Fuente cursiva
               fontWeight: FontWeight.bold, // Fuente más gruesa
@@ -113,7 +113,7 @@ class HomeScreen extends StatelessWidget {
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/usu-contra.jpg'),
+            image: AssetImage('assets/usu-contra.jpeg'),
             fit: BoxFit.contain,
             alignment: Alignment.center,
           ),
@@ -123,7 +123,7 @@ class HomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '¡Bienvenido a brainbattle!',
+                '',
                 style: TextStyle(
                   fontSize: 32, // Tamaño de fuente más grande
                   color: Colors.white,

@@ -122,7 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         automaticallyImplyLeading: false,
         title: Center(
           child: Text(
-            'Registro',
+            '',
             style: TextStyle(
               fontStyle: FontStyle.italic,
               fontWeight: FontWeight.bold,
@@ -143,7 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/registro.jpg'),
+            image: AssetImage('assets/registro.jpeg'),
             fit: BoxFit.contain,
             alignment: Alignment.center,
           ),
@@ -164,7 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ],
             ),
-            width: MediaQuery.of(context).size.width * 0.8,
+            width: MediaQuery.of(context).size.width * 0.5,
             child: Form(
               key: _formKey,
               child: Column(

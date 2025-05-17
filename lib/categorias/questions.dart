@@ -22,11 +22,35 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
   int _currentQuestionIndex = 0;
   int? _selectedIndex; // índice de la opción seleccionada
   late Future<List<Map<String, dynamic>>> _questionsFuture;
+  List<String> _shuffledOptions = [];
 
   @override
   void initState() {
     super.initState();
     _questionsFuture = Gestor.getQuestionsForCategory(widget.category);
+  }
+
+  void _prepareOptions(Map<String, dynamic> currentQuestion) {
+    List<String> options = [];
+    if (currentQuestion['options'] != null && currentQuestion['options'] is List) {
+      options = List<String>.from(currentQuestion['options']);
+    } else {
+      String getField(Map<String, dynamic> q, List<String> keys) {
+        for (final k in keys) {
+          if (q[k] != null && q[k].toString().isNotEmpty) return q[k].toString();
+        }
+        return '';
+      }
+      options = [
+        getField(currentQuestion, ['correctAnswer', 'RespuestaCorrecta', 'respuestacorrecta']),
+        getField(currentQuestion, ['RespuestaIncorrecta1', 'respuestaIncorrecta1', 'respuestaincorrecta1']),
+        getField(currentQuestion, ['RespuestaIncorrecta2', 'respuestaIncorrecta2', 'respuestaincorrecta2']),
+        getField(currentQuestion, ['RespuestaIncorrecta3', 'respuestaIncorrecta3', 'respuestaincorrecta3']),
+      ];
+    }
+    options.removeWhere((element) => element.isEmpty);
+    _shuffledOptions = List<String>.from(options);
+    _shuffledOptions.shuffle();
   }
 
   Color? _getButtonColor(int index, List<String> options, Map<String, dynamic> currentQuestion) {
@@ -78,44 +102,28 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
         String backgroundImage;
         switch (widget.category) {
           case 'Historia':
-            backgroundImage = 'assets/historia.jpg';
+            backgroundImage = 'assets/historia.jpeg';
             break;
           case 'Inglés':
-            backgroundImage = 'assets/ingles.jpg';
+            backgroundImage = 'assets/ingles.jpeg';
             break;
           case 'Matemáticas':
-            backgroundImage = 'assets/mate.jpg';
+            backgroundImage = 'assets/mate.jpeg';
             break;
           case 'Ciencias Naturales':
-            backgroundImage = 'assets/biologia.jpg';
+            backgroundImage = 'assets/biologia.jpeg';
             break;
           case 'Informática':
-            backgroundImage = 'assets/info.jpg';
+            backgroundImage = 'assets/info.jpeg';
             break;
           default:
-            backgroundImage = 'assets/questions.jpg';
+            backgroundImage = 'assets/questions.jpeg';
         }
 
-        // Construir las opciones a partir del modelo de la base de datos, robusto a diferentes nombres de campos
-        List<String> options = [];
-        if (currentQuestion['options'] != null && currentQuestion['options'] is List) {
-          options = List<String>.from(currentQuestion['options']);
-        } else {
-          String getField(Map<String, dynamic> q, List<String> keys) {
-            for (final k in keys) {
-              if (q[k] != null && q[k].toString().isNotEmpty) return q[k].toString();
-            }
-            return '';
-          }
-          options = [
-            getField(currentQuestion, ['correctAnswer', 'RespuestaCorrecta', 'respuestacorrecta']),
-            getField(currentQuestion, ['RespuestaIncorrecta1', 'respuestaIncorrecta1', 'respuestaincorrecta1']),
-            getField(currentQuestion, ['RespuestaIncorrecta2', 'respuestaIncorrecta2', 'respuestaincorrecta2']),
-            getField(currentQuestion, ['RespuestaIncorrecta3', 'respuestaIncorrecta3', 'respuestaincorrecta3']),
-          ];
+        // Solo mezclar opciones si es la primera vez que se muestra la pregunta
+        if (_shuffledOptions.isEmpty) {
+          _prepareOptions(currentQuestion);
         }
-        options.removeWhere((element) => element.isEmpty);
-        options.shuffle();
 
         return Scaffold(
           body: Container(
@@ -153,14 +161,14 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                 ),
                 SizedBox(height: 20),
                 Column(
-                  children: List.generate(options.length, (index) {
-                    final option = options[index];
+                  children: List.generate(_shuffledOptions.length, (index) {
+                    final option = _shuffledOptions[index];
                     return SizedBox(
                       width: 300,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         child: ElevatedButton(
-                          style: _getButtonStyle(index, options, currentQuestion),
+                          style: _getButtonStyle(index, _shuffledOptions, currentQuestion),
                           onPressed: _selectedIndex == null
                               ? () {
                                   setState(() {
@@ -171,6 +179,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                                       if (_currentQuestionIndex < questions.length - 1) {
                                         _currentQuestionIndex++;
                                         _selectedIndex = null;
+                                        _shuffledOptions = [];
                                       } else {
                                         widget.onBack();
                                       }
