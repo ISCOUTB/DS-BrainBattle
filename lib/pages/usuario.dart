@@ -57,14 +57,14 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/home.jpg'),
+            image: AssetImage('assets/usu-contra-movil.jpeg'),
             fit: BoxFit.contain,
             alignment: Alignment.center,
           ),
         ),
         child: Center(
           child: Container(
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.all(16), // Menos padding
             decoration: BoxDecoration(
               color: isDarkTheme ? Colors.grey[900]?.withOpacity(0.9) : Colors.white.withOpacity(0.9),
               borderRadius: BorderRadius.circular(20),
@@ -76,9 +76,11 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
                 ),
               ],
             ),
-            width: MediaQuery.of(context).size.width * 0.8,
+            width: MediaQuery.of(context).size.width > 350
+                ? 280
+                : MediaQuery.of(context).size.width * 0.8, // Más pequeño y responsivo
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.min, // Permite que el recuadro crezca según el contenido
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 CircleAvatar(
@@ -132,47 +134,47 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
                           color: isDarkTheme ? Colors.white : Colors.black,
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Text('Historial de Partidas:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDarkTheme ? Colors.white : Colors.black)),
-                      SizedBox(height: 10),
-                      Container(
-                        height: 200,
-                        child: ListView.builder(
-                          itemCount: historialPartidas.length,
-                          itemBuilder: (context, index) {
-                            final partida = historialPartidas[index];
-                            return Card(
-                              color: isDarkTheme ? Colors.grey[800] : Colors.white,
-                              child: ListTile(
-                                title: Text(
-                                  'Fecha: ${DateFormat('dd/MM/yyyy').format(partida.fecha)}',
-                                  style: TextStyle(color: isDarkTheme ? Colors.white : Colors.black),
-                                ),
-                                subtitle: Text(
-                                  'Puntaje: ${partida.puntaje} - Duración: ${partida.duracion.inMinutes} min',
-                                  style: TextStyle(color: isDarkTheme ? Colors.white70 : Colors.black87),
-                                ),
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: Text('Detalles de la Partida'),
-                                      content: Text('Fecha: ${DateFormat('dd/MM/yyyy').format(partida.fecha)}\nPuntaje: ${partida.puntaje}\nDuración: ${partida.duracion.inMinutes} minutos'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context),
-                                          child: Text('Cerrar'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text('Historial de Partidas:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDarkTheme ? Colors.white : Colors.black)),
+                SizedBox(height: 5),
+                Container(
+                  height: 150, // Altura fija solo para la lista, no para el recuadro completo
+                  child: ListView.builder(
+                    itemCount: historialPartidas.length,
+                    itemBuilder: (context, index) {
+                      final partida = historialPartidas[index];
+                      return Card(
+                        color: isDarkTheme ? Colors.grey[800] : Colors.white,
+                        child: ListTile(
+                          title: Text(
+                            'Fecha: ${DateFormat('dd/MM/yyyy').format(partida.fecha)}',
+                            style: TextStyle(color: isDarkTheme ? Colors.white : Colors.black),
+                          ),
+                          subtitle: Text(
+                            'Puntaje: ${partida.puntaje} - Duración: ${partida.duracion.inMinutes} min',
+                            style: TextStyle(color: isDarkTheme ? Colors.white70 : Colors.black87),
+                          ),
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Detalles de la Partida'),
+                                content: Text('Fecha: ${DateFormat('dd/MM/yyyy').format(partida.fecha)}\nPuntaje: ${partida.puntaje}\nDuración: ${partida.duracion.inMinutes} minutos'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text('Cerrar'),
+                                  ),
+                                ],
                               ),
                             );
                           },
                         ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ],

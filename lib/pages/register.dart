@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart'; // Para rootBundle
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class RegisterScreen extends StatefulWidget {
   final bool isDarkTheme;
@@ -38,24 +41,66 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return regex.hasMatch(username);
   }
 
-  Future<void> _register() async {
-    if (_formKey.currentState!.validate()) {
-      final url = Uri.parse('http://localhost:8000/api/registerUser');
+  Future<File> _getLocalUserFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final path = directory.path;
+    final file = File('$path/users.json');
+    if (!(await file.exists())) {
+      // Copia el archivo de assets la primera vez
+      String data;
       try {
-        final response = await http.post(
-          url,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'email': _emailController.text,
-            'first_name': _firstNameController.text,
-            'last_name': _firstNameController.text,
+        data = await rootBundle.loadString('assets/users.json');
+      } catch (e) {
+        data = await rootBundle.loadString('assets/users2.json');
+      }
+      await file.writeAsString(data);
+    }
+    return file;
+  }
+
+  Future<void> _register() async {
+    if (kIsWeb) {
+      await _registerWeb();
+      return;
+    }
+    if (_formKey.currentState!.validate()) {
+      try {
+        final file = await _getLocalUserFile();
+        final String data = await file.readAsString();
+        Map<String, dynamic> jsonResult = {};
+        List users = [];
+        try {
+          jsonResult = jsonDecode(data);
+          users = jsonResult['users'] ?? [];
+        } catch (e) {
+          users = [];
+        }
+        final exists = users.any((u) => (u['username'] ?? '') == _usernameController.text);
+        if (exists) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Error'),
+                content: Text('El usuario ya existe'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          // Agrega el nuevo usuario
+          users.add({
             'username': _usernameController.text,
             'password': _passwordController.text,
-            'registration_date': "${DateTime.now().month}/${DateTime.now().year}",
-          }),
-        );
-
-        if (response.statusCode == 200) {
+          });
+          await file.writeAsString(jsonEncode({'users': users}));
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -66,25 +111,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      Navigator.pushReplacementNamed(context, '/'); // Redirige a home.dart
-                    },
-                    child: Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
-        } else {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Error'),
-                content: Text('Error al registrar usuario'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
+                      Navigator.pushReplacementNamed(context, '/');
                     },
                     child: Text('OK'),
                   ),
@@ -99,7 +126,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('Error de conexión'),
-              content: Text('Error de conexión: $e'),
+              content: Text('Error: $e'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -112,6 +139,52 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         );
       }
+    }
+  }
+
+  Future<void> _registerWeb() async {
+    // Solo simula el registro en web, sin persistencia
+    final String data = await rootBundle.loadString('assets/users.json');
+    final Map<String, dynamic> jsonResult = jsonDecode(data);
+    final List users = jsonResult['users'];
+    final exists = users.any((u) => u['username'] == _usernameController.text);
+    if (exists) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Registro exitoso'),
+            content: Text('Registro Exitoso!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Éxito'),
+            content: Text('Registro exitoso '),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacementNamed(context, '/');
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -138,165 +211,180 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ],
       ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/registro.jpeg'),
-            fit: BoxFit.contain,
-            alignment: Alignment.center,
-          ),
-        ),
-        child: Center(
-          child: Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: widget.isDarkTheme
-                  ? Colors.grey[900]?.withOpacity(0.9)
-                  : Colors.white.withOpacity(0.9),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: widget.isDarkTheme ? Colors.black54 : Colors.black26,
-                  blurRadius: 10,
-                  offset: Offset(0, 5),
-                ),
-              ],
+      body: Stack(
+        children: [
+          // Imagen de fondo web
+          Positioned.fill(
+            child: Image.asset(
+              'assets/registro.jpeg',
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
             ),
-            width: MediaQuery.of(context).size.width * 0.5,
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Correo Electrónico',
-                      labelStyle: TextStyle(
-                        color: widget.isDarkTheme ? Colors.white : Colors.black,
-                      ),
-                    ),
-                    style: TextStyle(
-                      color: widget.isDarkTheme ? Colors.white : Colors.black,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingrese su correo electrónico';
-                      } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                        return 'Por favor ingrese un correo válido';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: _firstNameController,
-                    decoration: InputDecoration(
-                      labelText: 'Primer Nombre',
-                      labelStyle: TextStyle(
-                        color: widget.isDarkTheme ? Colors.white : Colors.black,
-                      ),
-                    ),
-                    style: TextStyle(
-                      color: widget.isDarkTheme ? Colors.white : Colors.black,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingrese su primer nombre';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: _lastNameController,
-                    decoration: InputDecoration(
-                      labelText: 'Primer Apellido',
-                      labelStyle: TextStyle(
-                        color: widget.isDarkTheme ? Colors.white : Colors.black,
-                      ),
-                    ),
-                    style: TextStyle(
-                      color: widget.isDarkTheme ? Colors.white : Colors.black,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingrese su primer apellido';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      labelText: 'Usuario',
-                      labelStyle: TextStyle(
-                        color: widget.isDarkTheme ? Colors.white : Colors.black,
-                      ),
-                    ),
-                    style: TextStyle(
-                      color: widget.isDarkTheme ? Colors.white : Colors.black,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingrese un usuario';
-                      } else if (!_isValidUsername(value)) {
-                        return 'El usuario no debe contener caracteres especiales';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: 'Contraseña',
-                      labelStyle: TextStyle(
-                        color: widget.isDarkTheme ? Colors.white : Colors.black,
-                      ),
-                    ),
-                    style: TextStyle(
-                      color: widget.isDarkTheme ? Colors.white : Colors.black,
-                    ),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingrese una contraseña';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 20),
-                      backgroundColor:
-                          widget.isDarkTheme ? Colors.grey[800] : Colors.blue,
-                    ),
-                    onPressed: _register,
-                    child: Text(
-                      'Registrar',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Roboto',
-                        color:
-                            widget.isDarkTheme ? Colors.white : Colors.black,
-                      ),
-                    ),
-                  ),
-                ],
+          ),
+          // Imagen de fondo móvil (superpuesta, con opacidad)
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/registro-movil.jpeg'),
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
+                ),
               ),
             ),
           ),
-        ),
+          Center(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: widget.isDarkTheme
+                    ? Colors.grey[900]?.withOpacity(0.9)
+                    : Colors.white.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: widget.isDarkTheme ? Colors.black54 : Colors.black26,
+                    blurRadius: 10,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+              ),
+              width: MediaQuery.of(context).size.width * 0.5,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Correo Electrónico',
+                        labelStyle: TextStyle(
+                          color: widget.isDarkTheme ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      style: TextStyle(
+                        color: widget.isDarkTheme ? Colors.white : Colors.black,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor ingrese su correo electrónico';
+                        } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                          return 'Por favor ingrese un correo válido';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    TextFormField(
+                      controller: _firstNameController,
+                      decoration: InputDecoration(
+                        labelText: 'Primer Nombre',
+                        labelStyle: TextStyle(
+                          color: widget.isDarkTheme ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      style: TextStyle(
+                        color: widget.isDarkTheme ? Colors.white : Colors.black,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor ingrese su primer nombre';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    TextFormField(
+                      controller: _lastNameController,
+                      decoration: InputDecoration(
+                        labelText: 'Primer Apellido',
+                        labelStyle: TextStyle(
+                          color: widget.isDarkTheme ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      style: TextStyle(
+                        color: widget.isDarkTheme ? Colors.white : Colors.black,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor ingrese su primer apellido';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    TextFormField(
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        labelText: 'Usuario',
+                        labelStyle: TextStyle(
+                          color: widget.isDarkTheme ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      style: TextStyle(
+                        color: widget.isDarkTheme ? Colors.white : Colors.black,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor ingrese un usuario';
+                        } else if (!_isValidUsername(value)) {
+                          return 'El usuario no debe contener caracteres especiales';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'Contraseña',
+                        labelStyle: TextStyle(
+                          color: widget.isDarkTheme ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      style: TextStyle(
+                        color: widget.isDarkTheme ? Colors.white : Colors.black,
+                      ),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor ingrese una contraseña';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 20),
+                          backgroundColor:
+                              widget.isDarkTheme ? Colors.grey[800] : Colors.blue,
+                        ),
+                        onPressed: _register,
+                        child: Text(
+                          'Registrar',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Roboto',
+                            color:
+                                widget.isDarkTheme ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

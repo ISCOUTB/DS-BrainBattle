@@ -4,7 +4,8 @@ import '../services/api_service.dart';
 class Gestor {
   static Future<List<Map<String, dynamic>>> getQuestionsForCategory(String category) async {
     final allQuestions = await ApiService.fetchPreguntas();
-    return allQuestions.where((q) => q['categoria'] == category).toList();
+    String normalize(String s) => s.trim().toLowerCase();
+    return allQuestions.where((q) => normalize(q['categoria'] ?? '') == normalize(category)).toList();
   }
 }
 
@@ -23,6 +24,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
   int? _selectedIndex; // índice de la opción seleccionada
   late Future<List<Map<String, dynamic>>> _questionsFuture;
   List<String> _shuffledOptions = [];
+  int _score = 0; // contador de respuestas correctas
 
   @override
   void initState() {
@@ -102,19 +104,19 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
         String backgroundImage;
         switch (widget.category) {
           case 'Historia':
-            backgroundImage = 'assets/historia.jpeg';
+            backgroundImage = 'assets/historia-movil.jpeg';
             break;
-          case 'Inglés':
-            backgroundImage = 'assets/ingles.jpeg';
+          case 'Ingles':
+            backgroundImage = 'assets/ingles-movil.jpeg';
             break;
-          case 'Matemáticas':
-            backgroundImage = 'assets/mate.jpeg';
+          case 'Matematicas':
+            backgroundImage = 'assets/mate-movil.jpeg';
             break;
           case 'Ciencias Naturales':
-            backgroundImage = 'assets/biologia.jpeg';
+            backgroundImage = 'assets/biologia-movil.jpeg';
             break;
-          case 'Informática':
-            backgroundImage = 'assets/info.jpeg';
+          case 'Informatica':
+            backgroundImage = 'assets/info-movil.jpeg';
             break;
           default:
             backgroundImage = 'assets/questions.jpeg';
@@ -139,6 +141,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(height: 120),
                 Container(
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -155,7 +158,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                   ),
                   child: Text(
                     currentQuestion['question'] ?? currentQuestion['Enunciado'] ?? '',
-                    style: TextStyle(fontSize: 32, color: Colors.black),
+                    style: TextStyle(fontSize: 22, color: Colors.black),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -173,17 +176,43 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                               ? () {
                                   setState(() {
                                     _selectedIndex = index;
+                                    // Sumar puntaje si es correcta
+                                    final correct = _shuffledOptions[index] == (currentQuestion['correctAnswer'] ?? currentQuestion['RespuestaCorrecta']);
+                                    if (correct) _score++;
                                   });
                                   Future.delayed(Duration(seconds: 1), () {
-                                    setState(() {
-                                      if (_currentQuestionIndex < questions.length - 1) {
+                                    if (_currentQuestionIndex < questions.length - 1) {
+                                      setState(() {
                                         _currentQuestionIndex++;
                                         _selectedIndex = null;
                                         _shuffledOptions = [];
-                                      } else {
-                                        widget.onBack();
-                                      }
-                                    });
+                                      });
+                                    } else {
+                                      // Mostrar dialogo de fin del juego con puntaje tipo 5/10
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (context) => AlertDialog(
+                                          title: Text('¡Fin del juego!'),
+                                          content: Text('Tu puntaje es: ${_score}/${questions.length}'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                                widget.onBack();
+                                                setState(() {
+                                                  _currentQuestionIndex = 0;
+                                                  _selectedIndex = null;
+                                                  _shuffledOptions = [];
+                                                  _score = 0;
+                                                });
+                                              },
+                                              child: Text('Volver a Categorías'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }
                                   });
                                 }
                               : null,

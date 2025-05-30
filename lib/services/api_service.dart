@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/services.dart'; // <-- Import necesario para rootBundle
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -24,23 +25,19 @@ class ApiService {
   }
 
   static Future<List<Map<String, dynamic>>> fetchPreguntas() async {
-    final url = Uri.parse('$baseUrl/preguntas');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
-      return data.map<Map<String, dynamic>>((item) => {
-        'question': item['enunciado'],
-        'options': [
-          item['respuesta_correcta'],
-          item['respuesta_incorrecta1'],
-          item['respuesta_incorrecta2'],
-          item['respuesta_incorrecta3'],
-        ]..shuffle(),
-        'correctAnswer': item['respuesta_correcta'],
-        'categoria': item['categoria'],
-      }).toList();
-    } else {
-      throw Exception('Error al cargar preguntas');
-    }
+    final String data = await rootBundle.loadString('assets/preguntas.json');
+    final jsonResult = json.decode(data);
+    final List<dynamic> preguntas = jsonResult['questions'];
+    return preguntas.map<Map<String, dynamic>>((item) => {
+      'question': item['question'],
+      'options': [
+        item['correctAnswer'],
+        item['RespuestaIncorrecta1'],
+        item['RespuestaIncorrecta2'],
+        item['RespuestaIncorrecta3'],
+      ]..shuffle(),
+      'correctAnswer': item['correctAnswer'],
+      'categoria': item['categoria'],
+    }).toList();
   }
 }

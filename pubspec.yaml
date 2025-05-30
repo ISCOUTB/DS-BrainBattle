@@ -37,6 +37,7 @@ dependencies:
 
   intl: ^0.18.0 # Agregado para soporte de formateo de fechas
   http: ^1.4.0
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:
@@ -63,14 +64,26 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/biologia.jpeg
+    - assets/biologia-movil.jpeg
     - assets/categorias.jpeg
+    - assets/categorias-movil.jpeg
     - assets/historia.jpeg
+    - assets/historia-movil.jpeg
     - assets/info.jpeg
+    - assets/info-movil.jpeg
     - assets/ingles.jpeg
+    - assets/ingles-movil.jpeg
     - assets/loading.jpeg
+    - assets/loading-movil.jpeg
     - assets/mate.jpeg
+    - assets/mate-movil.jpeg
     - assets/registro.jpeg
+    - assets/registro-movil.jpeg
     - assets/usu-contra.jpeg
+    - assets/usu-contra-movil.jpeg
+    - assets/users.json
+    - assets/users2.json
+    - assets/preguntas.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
